@@ -13,30 +13,6 @@ pipeline {
             }
         }
 
-        stage('Build GYMETR-login Backend') {
-            steps {
-                dir('backend/GYMETR-login') {
-                    sh 'docker build -t ${DOCKER_IMAGE_PREFIX}gymetr-login:latest .'
-                }
-            }
-        }
-
-        stage('Build GYMETR-Membership Backend') {
-            steps {
-                dir('backend/GYMETR-Membership') {
-                    sh 'docker build -t ${DOCKER_IMAGE_PREFIX}gymetr-membership:latest .'
-                }
-            }
-        }
-
-        stage('Build GYMETRA - Qr Backend') {
-            steps {
-                dir('backend/GYMETRA - Qr') {
-                    sh 'docker build -t ${DOCKER_IMAGE_PREFIX}gymetra-qr:latest .'
-                }
-            }
-        }
-
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
