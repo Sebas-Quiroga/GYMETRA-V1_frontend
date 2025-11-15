@@ -16,7 +16,7 @@ COPY vite.config.ts ./
 # Usar cache mount para npm para acelerar builds subsecuentes
 # Configuración optimizada para evitar problemas con Cypress
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev --prefer-offline
+    npm ci --prefer-offline
 
 ###############################
 # Etapa 2: Build
