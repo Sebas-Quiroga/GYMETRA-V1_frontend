@@ -16,7 +16,7 @@ pipeline {
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
-                    bat 'docker build -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .'
+                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .'
                 }
             }
         }
@@ -24,7 +24,7 @@ pipeline {
         stage('Build gymetra-frontend') {
             steps {
                 dir('frontend/gymetra-frontend') {
-                    bat 'docker build -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .'
+                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .'
                 }
             }
         }
