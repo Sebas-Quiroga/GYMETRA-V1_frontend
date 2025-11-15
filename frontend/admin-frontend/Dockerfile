@@ -28,10 +28,10 @@ ENV NODE_ENV=production
 RUN npm run build
 
 ###############################
-# Etapa 3: Runtime Nginx optimizado
+# Etapa 3: Runtime Node.js para desarrollo
 ###############################
-FROM nginx:1.27-alpine AS runtime
-WORKDIR /usr/share/nginx/html
+FROM node:20-alpine AS runtime
+WORKDIR /app
 
 ARG GIT_COMMIT
 ARG BUILD_TIME
@@ -39,60 +39,14 @@ LABEL org.opencontainers.image.title="admin-frontend" \
       org.opencontainers.image.source="https://github.com/Sebas-Quiroga/GYMETRA-V1" \
       org.opencontainers.image.revision="$GIT_COMMIT" \
       org.opencontainers.image.created="$BUILD_TIME" \
-      org.opencontainers.image.description="Admin Frontend GYMETRA (SPA)"
+      org.opencontainers.image.description="Admin Frontend GYMETRA (Dev Mode)"
 
-COPY --from=build /app/dist .
+COPY --from=deps /app /app
+COPY src src
+COPY index.html ./
+COPY vite.config.ts ./
 
-# Configuración nginx minimalista para SPA con proxy API
-RUN rm /etc/nginx/conf.d/default.conf || true
-COPY <<'EOF' /etc/nginx/conf.d/app.conf
-server {
-    listen 80;
-    server_name _;
-    root /usr/share/nginx/html;
-    index index.html;
+EXPOSE 8101
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost:8101/ || exit 1
 
-    # Proxy para /api hacia gymetr-login
-    location /api {
-        proxy_pass http://gymetr-login:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-
-    # Proxy para /membership-api hacia gymetr-membership, reescribiendo a /api
-    location /membership-api {
-        rewrite ^/membership-api(.*) /api$1 break;
-        proxy_pass http://gymetr-membership:8081;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_connect_timeout 60s;
-        proxy_send_timeout 60s;
-        proxy_read_timeout 60s;
-    }
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
-        expires 30d;
-        add_header Cache-Control "public, max-age=2592000";
-    }
-
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
-}
-EOF
-
-EXPOSE 80
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost/ || exit 1
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev"]
