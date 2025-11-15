@@ -3,10 +3,10 @@ services:
     build: ./frontend/admin-frontend
     ports:
       - "8101:8101"
-    container_name: develop-admin-frontend
+    container_name: qa-admin-frontend
 
   gymetra-frontend:
     build: ./frontend/gymetra-frontend
     ports:
       - "8100:80"
-    container_name: develop-gymetra-frontend
+    container_name: qa-gymetra-frontend

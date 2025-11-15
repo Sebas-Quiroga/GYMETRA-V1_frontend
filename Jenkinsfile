@@ -38,9 +38,6 @@ pipeline {
     }
 
     post {
-        always {
-            bat 'docker system prune -f'
-        }
         success {
             echo 'Deployment successful!'
         }
