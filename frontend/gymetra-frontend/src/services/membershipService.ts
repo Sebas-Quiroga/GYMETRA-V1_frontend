@@ -61,6 +61,7 @@ export async function getAvailableMemberships(): Promise<Membership[]> {
 
 
 
+
 // ===============================
 // Comprar una membresía
 // ===============================
@@ -174,10 +175,7 @@ export function getMembershipIcon(days: number): string {
 
 // Validar si una membresía está disponible
 export function isMembershipAvailable(membership: Membership): boolean {
-  // Como las membresías vienen del endpoint /available, asumimos que están disponibles
-  // Si el backend no está configurando correctamente el status, esto evita que aparezcan como no disponibles
-  console.log('🔍 Verificando disponibilidad de membresía:', membership.planName, 'Status:', membership.status);
-  return membership.status === 'available' || membership.status == null || membership.status === '';
+  return membership.status === 'available' || membership.status === 'ACTIVE';
 }
 
 // Calcular descuento (si aplica)

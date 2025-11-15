@@ -70,15 +70,15 @@
 
             <!-- Correo -->
             <div class="form-group">
-              <label for="email" class="form-label">Tu Dirección de Correo Electrónico *</label>
+              <label for="email" class="form-label">Correo Electrónico *</label>
               <div class="input-group">
                 <ion-icon :icon="mailOutline" class="input-icon"></ion-icon>
                 <input
                   id="email"
                   v-model="form.email"
                   type="email"
-                  class="form-input email-input"
-                  placeholder="ejemplo@correo.com"
+                  class="form-input"
+                  placeholder="usuario@ejemplo.com"
                   required
                   :class="{ 'error': errors.email }"
                   @input="handleEmailInput"
@@ -510,13 +510,13 @@ const validateEmail = () => {
   const email = form.email.trim()
 
   if (!email) {
-    errors.email = 'Por favor, ingresa tu dirección de correo electrónico'
+    errors.email = 'El correo electrónico es requerido'
     return false
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!emailRegex.test(email)) {
-    errors.email = 'Por favor, ingresa una dirección de correo electrónico válida'
+    errors.email = 'Ingresa un correo electrónico válido'
     return false
   }
 
@@ -659,9 +659,9 @@ const handleSubmit = async () => {
     } else {
       // Handle API errors
       if (result.message?.includes('email')) {
-        errors.email = 'Esta dirección de correo electrónico ya está registrada'
+        errors.email = 'El correo electrónico ya está registrado'
       } else if (result.message?.includes('identificación')) {
-        errors.identification = 'Este número de identificación ya está registrado'
+        errors.identification = 'El número de identificación ya está registrado'
       } else {
         errors.email = result.message || 'Error al actualizar el usuario'
       }
@@ -669,7 +669,7 @@ const handleSubmit = async () => {
 
   } catch (error) {
     console.error('Error updating user:', error)
-    errors.email = 'Error de conexión. Por favor, inténtalo de nuevo.'
+    errors.email = 'Error de conexión. Inténtalo de nuevo.'
   } finally {
     submitting.value = false
   }

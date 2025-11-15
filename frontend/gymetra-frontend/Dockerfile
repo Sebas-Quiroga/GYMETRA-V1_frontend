@@ -3,6 +3,7 @@
 ###############################
 FROM node:20-alpine AS deps
 WORKDIR /app
+
 ARG BUILD_TIME
 ARG GIT_COMMIT
 
@@ -15,7 +16,7 @@ COPY vite.config.ts ./
 # Usar cache mount para npm para acelerar builds subsecuentes
 # Configuración optimizada para evitar problemas con Cypress
 RUN --mount=type=cache,target=/root/.npm \
-    npm ci --prefer-offline
+    npm ci --omit=dev --prefer-offline
 
 ###############################
 # Etapa 2: Build
