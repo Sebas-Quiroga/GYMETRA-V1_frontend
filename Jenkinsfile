@@ -16,7 +16,7 @@ pipeline {
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
-                    sh 'docker build -t ${DOCKER_IMAGE_PREFIX}admin-frontend:latest .'
+                    bat 'docker build -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .'
                 }
             }
         }
@@ -24,22 +24,22 @@ pipeline {
         stage('Build gymetra-frontend') {
             steps {
                 dir('frontend/gymetra-frontend') {
-                    sh 'docker build -t ${DOCKER_IMAGE_PREFIX}gymetra-frontend:latest .'
+                    bat 'docker build -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .'
                 }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                sh 'docker-compose down'
-                sh 'docker-compose up -d --build'
+                bat 'docker-compose down'
+                bat 'docker-compose up -d --build'
             }
         }
     }
 
     post {
         always {
-            sh 'docker system prune -f'
+            bat 'docker system prune -f'
         }
         success {
             echo 'Deployment successful!'
