@@ -27,7 +27,8 @@
     "pinia": "^3.0.3",
     "qrcode.vue": "^3.6.0",
     "vue": "^3.3.0",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "vue-tsc": "^2.1.10"
   },
   "devDependencies": {
     "@capacitor/cli": "7.4.3",
