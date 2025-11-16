@@ -1,8 +1,6 @@
 // src/services/metricsService.ts
 import axios from 'axios';
-
-// URL base para métricas (usando proxy del admin frontend)
-const METRICS_API_URL = '/membership-api';
+import { MAIN_API_URL, MEMBERSHIP_API_URL } from './apiService';
 
 // Interfaces para métricas
 export interface MetricsData {
@@ -78,22 +76,22 @@ export async function getMetricsData(): Promise<MetricsData> {
     console.log('📊 Cargando métricas del dashboard...');
 
     // Obtener datos de múltiples endpoints usando axios con manejo de errores individual
-    const usersPromise = axios.get('/api/auth/users').catch(err => {
+    const usersPromise = axios.get(`${MAIN_API_URL}/auth/users`).catch(err => {
       console.warn('⚠️ Endpoint /api/auth/users no disponible:', err.message);
       return { data: [] };
     });
 
-    const membershipsPromise = axios.get(`${METRICS_API_URL}/memberships`).catch(err => {
+    const membershipsPromise = axios.get(`${MEMBERSHIP_API_URL}/memberships`).catch(err => {
       console.warn('⚠️ Endpoint /memberships no disponible:', err.message);
       return { data: [] };
     });
 
-    const paymentsPromise = axios.get(`${METRICS_API_URL}/payments/all`).catch(err => {
+    const paymentsPromise = axios.get(`${MEMBERSHIP_API_URL}/payments/all`).catch(err => {
       console.warn('⚠️ Endpoint /payments/all no disponible:', err.message);
       return { data: [] };
     });
 
-    const userMembershipsPromise = axios.get(`${METRICS_API_URL}/user-memberships/all`).catch(err => {
+    const userMembershipsPromise = axios.get(`${MEMBERSHIP_API_URL}/user-memberships/all`).catch(err => {
       console.warn('⚠️ Endpoint /user-memberships/all no disponible:', err.message);
       return { data: [] };
     });

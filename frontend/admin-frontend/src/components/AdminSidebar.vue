@@ -148,7 +148,6 @@ const navigateToPayments = () => {
   emit('navigateToPayments')
 }
 
-
 const logout = () => {
   emit('logout')
 }

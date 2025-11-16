@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = '/api/auth'; // Usar proxy de Vite
+import { MAIN_API_URL } from './apiService';
 
 export interface User {
   userId: number;
@@ -20,19 +19,11 @@ export interface Role {
   roleName: string;
 }
 
-export interface RoleRequest {
-  roleName: string;
-}
-
-export interface RoleResponse {
-  roleId: number;
-  roleName: string;
-}
 
 export const userService = {
   async getAllUsers(): Promise<User[]> {
     try {
-      const response = await axios.get(`${API_BASE_URL}/users`);
+      const response = await axios.get(`${MAIN_API_URL}/auth/users`);
       return response.data;
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -42,7 +33,7 @@ export const userService = {
 
   async deleteUser(userId: number): Promise<boolean> {
     try {
-      const response = await axios.delete(`${API_BASE_URL}/users/${userId}`);
+      const response = await axios.delete(`${MAIN_API_URL}/auth/users/${userId}`);
       return response.status === 200;
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -52,7 +43,7 @@ export const userService = {
 
   async getRoles(): Promise<Role[]> {
     try {
-      const response = await axios.get('/api/roles');
+      const response = await axios.get(`${MAIN_API_URL}/roles`);
       return response.data;
     } catch (error) {
       console.error('Error fetching roles:', error);
@@ -60,49 +51,10 @@ export const userService = {
     }
   },
 
-  async createRole(roleData: RoleRequest): Promise<RoleResponse> {
-    try {
-      const response = await axios.post('/api/roles', roleData);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating role:', error);
-      throw error;
-    }
-  },
-
-  async getRoleById(roleId: number): Promise<RoleResponse> {
-    try {
-      const response = await axios.get(`/api/roles/${roleId}`);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching role:', error);
-      throw error;
-    }
-  },
-
-  async updateRole(roleId: number, roleData: RoleRequest): Promise<RoleResponse> {
-    try {
-      const response = await axios.put(`/api/roles/${roleId}`, roleData);
-      return response.data;
-    } catch (error) {
-      console.error('Error updating role:', error);
-      throw error;
-    }
-  },
-
-  async deleteRole(roleId: number): Promise<boolean> {
-    try {
-      const response = await axios.delete(`/api/roles/${roleId}`);
-      return response.status === 200;
-    } catch (error) {
-      console.error('Error deleting role:', error);
-      throw error;
-    }
-  },
 
   async updateUserStatus(userId: number, status: 'active' | 'suspended'): Promise<boolean> {
     try {
-      const response = await axios.patch(`/api/auth/users/${userId}/status?status=${status}`);
+      const response = await axios.patch(`${MAIN_API_URL}/auth/users/${userId}/status?status=${status}`);
       return response.status === 200;
     } catch (error) {
       console.error('Error updating user status:', error);

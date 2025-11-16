@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const MEMBERSHIP_API_URL = '/membership-api'; // Usar proxy específico para backend de membresías
+import { MEMBERSHIP_API_URL } from './apiService';
 
 export interface Membership {
   membershipId: number;
@@ -36,10 +35,12 @@ export const membershipService = {
   async getAllMemberships(): Promise<Membership[]> {
     try {
       // Para admin, obtener TODAS las membresías (no solo las disponibles)
+      console.log('🔍 Llamando a:', `${MEMBERSHIP_API_URL}/memberships`);
       const response = await axios.get(`${MEMBERSHIP_API_URL}/memberships`);
       return response.data;
     } catch (error) {
-      console.error('Error fetching memberships:', error);
+      console.error('❌ Error fetching memberships:', error);
+      console.error('URL intentada:', `${MEMBERSHIP_API_URL}/memberships`);
       throw error;
     }
   },

@@ -279,8 +279,8 @@
                 <div class="metric-icon">💰</div>
                 <div class="metric-content">
                   <div class="metric-value">{{ getAverageRevenuePerUser() }}</div>
-                  <div class="metric-label">Ingreso por Usuario</div>
-                  <div class="metric-desc">Promedio mensual</div>
+                  <div class="metric-label">Ingreso por Membresía</div>
+                  <div class="metric-desc">Promedio mensual por membresía activa</div>
                 </div>
               </div>
               <div class="metric-item">
@@ -577,8 +577,13 @@ const getConversionRate = (): string => {
 }
 
 const getAverageRevenuePerUser = (): string => {
-  if (metrics.value.activeUsers === 0) return '$0'
-  const avg = metrics.value.monthlyRevenue / metrics.value.activeUsers
+  // Calcular ingreso promedio por membresía activa
+  // Esto es más coherente que dividir por usuarios totales
+  const activeMembershipsCount = Math.max(metrics.value.activeMemberships + metrics.value.pendingMemberships, 1)
+
+  if (metrics.value.monthlyRevenue === 0 || activeMembershipsCount === 0) return '$0'
+
+  const avg = metrics.value.monthlyRevenue / activeMembershipsCount
   return formatCurrency(avg)
 }
 

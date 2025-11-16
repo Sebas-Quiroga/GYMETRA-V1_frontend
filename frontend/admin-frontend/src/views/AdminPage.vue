@@ -7,7 +7,6 @@
       @navigate-to-reports="navigateToReports"
       @navigate-to-charts="navigateToCharts"
       @navigate-to-payments="navigateToPayments"
-      @navigate-to-roles="navigateToRoles"
       @logout="logout"
     />
 
@@ -435,11 +434,6 @@ const navigateToCharts = () => {
 const navigateToPayments = () => {
   activeSection.value = 'payments'
   router.push('/adminpagos')
-}
-
-const navigateToRoles = () => {
-  activeSection.value = 'roles'
-  router.push('/admin/roles')
 }
 
 // Funciones para manejar usuarios

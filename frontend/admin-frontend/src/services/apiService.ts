@@ -1,1 +1,4 @@
-export const MAIN_API_URL = "http://3.14.191.19:8080/api";
+import { HOST_URL } from "./config";
+
+export const MAIN_API_URL = `${HOST_URL}:8080/api`;
+export const MEMBERSHIP_API_URL = `${HOST_URL}:8081/api`;
