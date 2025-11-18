@@ -6,6 +6,10 @@ Distributed system for comprehensive gym membership management, developed as an 
 
 ### ✨ Key Features
 
+docker run -d \--name jenkins \-p 9090:9090 \-p 50001:50001 \-v jenkins_home:/var/jenkins_home \-v /var/run/docker.sock:/var/run/docker.sock \ jenkins/jenkins:lts
+
+
+
 - 🔐 **Authentication & Authorization** with JWT and roles (Administrator, Client)
 - 👥 **User Management** with registration, login, and profiles
 - 💳 **Membership Management** (registration, renewal, suspension)
