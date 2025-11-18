@@ -6,9 +6,19 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+
                 script {
-                    def safe = env.BRANCH_NAME.replace('/', '-')
-                    env.SAFE_BRANCH = safe
+                    // Obtener la rama real desde Git
+                    def branch = sh(
+                        script: "git rev-parse --abbrev-ref HEAD",
+                        returnStdout: true
+                    ).trim()
+
+                    // Reemplazar "/" por "-"
+                    env.SAFE_BRANCH = branch.replace('/', '-')
+
+                    echo "Rama detectada: ${branch}"
+                    echo "SAFE_BRANCH: ${env.SAFE_BRANCH}"
                 }
             }
         }
@@ -16,14 +26,17 @@ pipeline {
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
-                    bat """
-                    if not exist node_modules (
-                        npm install
-                    )
-                    if not exist dist (
-                        npm run build
-                    )
-                    """
+                    bat '''
+                        if not exist node_modules (
+                            echo Instalando dependencias...
+                            call npm install
+                        )
+
+                        if not exist dist (
+                            echo Construyendo proyecto...
+                            call npm run build
+                        )
+                    '''
                 }
             }
         }
@@ -31,29 +44,34 @@ pipeline {
         stage('Build gymetra-frontend') {
             steps {
                 dir('frontend/gymetra-frontend') {
-                    bat """
-                    if not exist node_modules (
-                        npm install
-                    )
-                    if not exist dist (
-                        npm run build
-                    )
-                    """
+                    bat '''
+                        if not exist node_modules (
+                            echo Instalando dependencias...
+                            call npm install
+                        )
+
+                        if not exist dist (
+                            echo Construyendo proyecto...
+                            call npm run build
+                        )
+                    '''
                 }
             }
         }
 
         stage('Deploy with Docker Compose') {
             steps {
-                bat """
-                docker compose ps > status.txt
-                findstr /C:"Up" status.txt >nul
-                if errorlevel 1 (
-                    docker compose up -d --build
-                ) else (
-                    echo Los contenedores ya estan corriendo
-                )
-                """
+                bat '''
+                    docker compose ps > status.txt
+
+                    findstr /C:"Up" status.txt
+                    if %ERRORLEVEL%==0 (
+                        echo Servicios ya levantados.
+                    ) else (
+                        echo Levantando servicios...
+                        docker compose up -d --build
+                    )
+                '''
             }
         }
     }
