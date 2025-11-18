@@ -1,15 +1,21 @@
 pipeline {
     agent any
 
-    environment {
-        SAFE_BRANCH = "${env.BRANCH_NAME.replace('/', '-')}"
-    }
-
     stages {
 
         stage('Checkout') {
             steps {
                 checkout scm
+
+                script {
+                    // Obtener la rama desde Jenkins
+                    def branchName = env.BRANCH_NAME ?: "desconocida"
+                    def safeBranch = branchName.replace('/', '-')
+                    env.SAFE_BRANCH = safeBranch
+
+                    echo "Rama detectada: ${branchName}"
+                    echo "SAFE_BRANCH: ${env.SAFE_BRANCH}"
+                }
             }
         }
 
@@ -19,13 +25,11 @@ pipeline {
                     bat '''
                         echo === ADMIN FRONTEND ===
 
-                        echo Verificando node_modules...
                         if not exist node_modules (
                             echo Instalando dependencias...
                             npm install
                         )
 
-                        echo Verificando carpeta dist...
                         if not exist dist (
                             echo Construyendo proyecto...
                             npm run build
@@ -41,13 +45,11 @@ pipeline {
                     bat '''
                         echo === GYMETRA FRONTEND ===
 
-                        echo Verificando node_modules...
                         if not exist node_modules (
                             echo Instalando dependencias...
                             npm install
                         )
 
-                        echo Verificando carpeta dist...
                         if not exist dist (
                             echo Construyendo proyecto...
                             npm run build
@@ -61,6 +63,7 @@ pipeline {
             steps {
                 bat '''
                     echo === DEPLOY DOCKER COMPOSE ===
+
                     docker compose ps > status.txt
 
                     findstr /C:"Up" status.txt
@@ -80,7 +83,7 @@ pipeline {
             echo "Pipeline finalizado."
         }
         failure {
-            echo "El pipeline fallo."
+            echo "El pipeline falló."
         }
     }
 }
