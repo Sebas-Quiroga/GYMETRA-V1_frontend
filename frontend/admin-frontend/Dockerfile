@@ -1,28 +1,24 @@
-###############################
-# Etapa 1: Runtime Node.js para desarrollo
-###############################
-FROM node:20-alpine AS runtime
+# ----------- BUILD STAGE -----------
+FROM node:18 AS build
 WORKDIR /app
 
-ARG GIT_COMMIT
-ARG BUILD_TIME
-LABEL org.opencontainers.image.title="admin-frontend" \
-      org.opencontainers.image.source="https://github.com/Sebas-Quiroga/GYMETRA-V1" \
-      org.opencontainers.image.revision="$GIT_COMMIT" \
-      org.opencontainers.image.created="$BUILD_TIME" \
-      org.opencontainers.image.description="Admin Frontend GYMETRA (Dev Mode)"
-
+# Copiar dependencias
 COPY package*.json ./
-COPY tsconfig.json ./
-COPY vite.config.ts ./
-COPY src src
-COPY index.html ./
+RUN npm install
 
-# Instalar dependencias
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --prefer-offline
+# Copiar todo el código fuente
+COPY . .
 
-EXPOSE 8101
-HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -qO- http://localhost:8101/ || exit 1
+# Compilar Vue
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
+# ----------- SERVE STAGE -----------
+FROM nginx:alpine
+
+# Copiar build generado al NGINX
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Exponer puerto interno
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

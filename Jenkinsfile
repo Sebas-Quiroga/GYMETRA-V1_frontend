@@ -2,46 +2,76 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_PREFIX = 'develop-'
-        DOCKER_REGISTRY = 'your-registry.com' // Replace with your Docker registry
+        DOCKER_USER = 'quiroga148'
+        EC2_HOST = '3.14.191.19'
+        SSH_KEY = 'C:\\ProgramData\\Jenkins\\.ssh\\ec2-key.ppk'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main-jenkis', url: 'https://github.com/Sebas-Quiroga/GYMETRA-V1_frontend.git'
             }
         }
 
-        stage('Build admin-frontend') {
+        stage('Build Frontend Images') {
             steps {
+
                 dir('frontend/admin-frontend') {
-                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .'
+                    bat """
+                    docker build --no-cache -t %DOCKER_USER%/gymetra-admin-frontend:latest .
+                    """
                 }
-            }
-        }
 
-        stage('Build gymetra-frontend') {
-            steps {
                 dir('frontend/gymetra-frontend') {
-                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .'
+                    bat """
+                    docker build --no-cache -t %DOCKER_USER%/gymetra-frontend:latest .
+                    """
                 }
             }
         }
 
-        stage('Deploy with Docker Compose') {
+        stage('Login to DockerHub') {
             steps {
-                bat 'docker-compose up -d --build'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+                    bat """
+                    echo %PASS% | docker login -u %USER% --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Images to DockerHub') {
+            steps {
+                bat "docker push %DOCKER_USER%/gymetra-admin-frontend:latest"
+                bat "docker push %DOCKER_USER%/gymetra-frontend:latest"
+            }
+        }
+
+        stage('Deploy on AWS EC2') {
+            steps {
+                bat """
+                plink -i "%SSH_KEY%" -ssh ubuntu@%EC2_HOST% ^
+                    "cd ~/deploy && docker compose -f docker-compose.front.aws.yml pull && docker compose -f docker-compose.front.aws.yml up -d --remove-orphans"
+                """
             }
         }
     }
 
     post {
+        always {
+            bat "docker system prune -f"
+        }
         success {
-            echo 'Deployment successful!'
+            echo 'Frontend desplegado en AWS con éxito 🚀🔥'
         }
         failure {
-            echo 'Deployment failed!'
+            echo 'Fallo el despliegue del frontend ❌'
         }
     }
 }
