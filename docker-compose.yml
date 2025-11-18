@@ -1,12 +1,25 @@
+version: '3.8'
+
 services:
-  admin-frontend:
-    build: ./frontend/admin-frontend
-    ports:
-      - "8101:8101"
-    container_name: main-admin-frontend
 
   gymetra-frontend:
-    build: ./frontend/gymetra-frontend
+    image: quiroga148/gymetra-frontend:latest
+    container_name: gymetra-frontend
+    restart: always
     ports:
       - "8100:80"
-    container_name: main-gymetra-frontend
+    networks:
+      - gymetra-net
+
+  admin-frontend:
+    image: quiroga148/gymetra-admin-frontend:latest
+    container_name: gymetra-admin-frontend
+    restart: always
+    ports:
+      - "8101:80"
+    networks:
+      - gymetra-net
+
+networks:
+  gymetra-net:
+    driver: bridge
