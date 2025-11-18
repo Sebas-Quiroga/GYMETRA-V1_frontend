@@ -8,9 +8,9 @@ pipeline {
                 checkout scm
 
                 script {
-                    // Obtener la rama real desde Git
-                    def branch = sh(
-                        script: "git rev-parse --abbrev-ref HEAD",
+                    // Obtener la rama actual
+                    def branch = bat(
+                        script: 'git rev-parse --abbrev-ref HEAD',
                         returnStdout: true
                     ).trim()
 
@@ -27,15 +27,15 @@ pipeline {
             steps {
                 dir('frontend/admin-frontend') {
                     bat '''
+                        echo Instalando dependencias...
                         if not exist node_modules (
-                            echo Instalando dependencias...
                             call npm install
+                        ) else (
+                            echo node_modules ya existe. Saltando instalación...
                         )
 
-                        if not exist dist (
-                            echo Construyendo proyecto...
-                            call npm run build
-                        )
+                        echo Construyendo proyecto...
+                        call npm run build
                     '''
                 }
             }
@@ -45,15 +45,15 @@ pipeline {
             steps {
                 dir('frontend/gymetra-frontend') {
                     bat '''
+                        echo Instalando dependencias...
                         if not exist node_modules (
-                            echo Instalando dependencias...
                             call npm install
+                        ) else (
+                            echo node_modules ya existe. Saltando instalación...
                         )
 
-                        if not exist dist (
-                            echo Construyendo proyecto...
-                            call npm run build
-                        )
+                        echo Construyendo proyecto...
+                        call npm run build
                     '''
                 }
             }
@@ -62,13 +62,14 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 bat '''
+                    echo Verificando estado de los servicios Docker...
                     docker compose ps > status.txt
 
                     findstr /C:"Up" status.txt
                     if %ERRORLEVEL%==0 (
-                        echo Servicios ya levantados.
+                        echo Servicios ya levantados. No se recrean.
                     ) else (
-                        echo Levantando servicios...
+                        echo Levantando servicios con build...
                         docker compose up -d --build
                     )
                 '''
