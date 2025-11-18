@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE_PREFIX = 'develop-'
-        DOCKER_REGISTRY = 'your-registry.com' // Replace with your Docker registry
+        DOCKER_REGISTRY = 'your-registry.com'
     }
 
     stages {
@@ -60,10 +60,10 @@ pipeline {
             bat 'docker system prune -f'
         }
         success {
-            echo 'Deployment successful!'
+            echo "Deployment successful!"
         }
         failure {
-            echo 'Deployment failed!'
+            echo "Deployment failed!"
         }
     }
 }
