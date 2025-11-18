@@ -8,17 +8,24 @@ pipeline {
                 checkout scm
 
                 script {
-                    // Obtener la rama actual desde git
-                    def branch = bat(
+                    // Obtener la rama actual desde git (Windows-safe)
+                    def rawBranch = bat(
                         script: 'git rev-parse --abbrev-ref HEAD',
                         returnStdout: true
                     ).trim()
 
-                    // Reemplazar "/" por "-"
-                    env.SAFE_BRANCH = branch.replace('/', '-')
+                    echo "Rama bruta detectada: ${rawBranch}"
 
-                    echo "Rama detectada: ${branch}"
-                    echo "SAFE_BRANCH: ${env.SAFE_BRANCH}"
+                    // Sanitizar la rama para que Docker la acepte
+                    // Solo permite: letras, números, puntos, guiones y subrayados
+                    def safe = rawBranch
+                        .replaceAll('[^a-zA-Z0-9_.-]', '_')
+                        .replace('/', '-') // extra seguridad
+                        .trim()
+
+                    env.SAFE_BRANCH = safe
+
+                    echo "SAFE_BRANCH final: ${env.SAFE_BRANCH}"
                 }
             }
         }
@@ -36,6 +43,7 @@ pipeline {
 
                         echo Construyendo proyecto...
                         call npm run build
+                        echo Build admin-frontend completado.
                     '''
                 }
             }
@@ -54,6 +62,7 @@ pipeline {
 
                         echo Construyendo proyecto...
                         call npm run build
+                        echo Build gymetra-frontend completado.
                     '''
                 }
             }
@@ -63,15 +72,17 @@ pipeline {
             steps {
                 bat '''
                     echo Verificando estado de los servicios Docker...
-                    docker compose ps > status.txt
+                    docker compose ps > status.txt 2>&1
 
-                    findstr /C:"Up" status.txt
+                    findstr /C:"Up" status.txt >nul
                     if %ERRORLEVEL%==0 (
-                        echo Servicios ya levantados. No se recrean.
+                        echo Servicios ya están arriba. No se recrean.
                     ) else (
                         echo Levantando servicios con build...
                         docker compose up -d --build
                     )
+
+                    echo Deployment completado.
                 '''
             }
         }
