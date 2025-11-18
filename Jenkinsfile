@@ -16,15 +16,15 @@ pipeline {
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
-                    bat '''
-                    set IMAGE_EXISTS=0
-                    for /f %%i in ('docker images -q %DOCKER_IMAGE_PREFIX%admin-frontend:latest') do set IMAGE_EXISTS=1
-                    if %IMAGE_EXISTS%==0 (
-                        echo Building admin-frontend image...
-                        docker build --no-cache -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .
-                    ) else (
-                        echo admin-frontend image already exists, skipping build.
-                    )
+                    sh '''
+                    IMAGE="{$DOCKER_IMAGE_PREFIX}admin-frontend:latest"
+
+                    if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
+                        echo "Building admin-frontend image..."
+                        docker build --no-cache -t $DOCKER_IMAGE_PREFIXadmin-frontend:latest .
+                    else
+                        echo "admin-frontend image already exists, skipping build."
+                    fi
                     '''
                 }
             }
@@ -33,15 +33,15 @@ pipeline {
         stage('Build gymetra-frontend') {
             steps {
                 dir('frontend/gymetra-frontend') {
-                    bat '''
-                    set IMAGE_EXISTS=0
-                    for /f %%i in ('docker images -q %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest') do set IMAGE_EXISTS=1
-                    if %IMAGE_EXISTS%==0 (
-                        echo Building gymetra-frontend image...
-                        docker build --no-cache -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .
-                    ) else (
-                        echo gymetra-frontend image already exists, skipping build.
-                    )
+                    sh '''
+                    IMAGE="${DOCKER_IMAGE_PREFIX}gymetra-frontend:latest"
+
+                    if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
+                        echo "Building gymetra-frontend image..."
+                        docker build --no-cache -t ${DOCKER_IMAGE_PREFIX}gymetra-frontend:latest .
+                    else
+                        echo "gymetra-frontend image already exists, skipping build."
+                    fi
                     '''
                 }
             }
@@ -49,21 +49,21 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
-                bat 'docker-compose down'
-                bat 'docker-compose up -d'
+                sh 'docker compose down'
+                sh 'docker compose up -d'
             }
         }
     }
 
     post {
         always {
-            bat 'docker system prune -f'
+            sh 'docker system prune -f'
         }
         success {
-            echo "Deployment successful!"
+            echo 'Deployment successful!'
         }
         failure {
-            echo "Deployment failed!"
+            echo 'Deployment failed!'
         }
     }
 }
