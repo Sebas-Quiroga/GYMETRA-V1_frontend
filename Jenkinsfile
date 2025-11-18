@@ -16,7 +16,16 @@ pipeline {
         stage('Build admin-frontend') {
             steps {
                 dir('frontend/admin-frontend') {
-                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .'
+                    bat '''
+                    set IMAGE_EXISTS=0
+                    for /f %%i in ('docker images -q %DOCKER_IMAGE_PREFIX%admin-frontend:latest') do set IMAGE_EXISTS=1
+                    if %IMAGE_EXISTS%==0 (
+                        echo Building admin-frontend image...
+                        docker build --no-cache -t %DOCKER_IMAGE_PREFIX%admin-frontend:latest .
+                    ) else (
+                        echo admin-frontend image already exists, skipping build.
+                    )
+                    '''
                 }
             }
         }
@@ -24,7 +33,16 @@ pipeline {
         stage('Build gymetra-frontend') {
             steps {
                 dir('frontend/gymetra-frontend') {
-                    bat 'docker build --no-cache -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .'
+                    bat '''
+                    set IMAGE_EXISTS=0
+                    for /f %%i in ('docker images -q %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest') do set IMAGE_EXISTS=1
+                    if %IMAGE_EXISTS%==0 (
+                        echo Building gymetra-frontend image...
+                        docker build --no-cache -t %DOCKER_IMAGE_PREFIX%gymetra-frontend:latest .
+                    ) else (
+                        echo gymetra-frontend image already exists, skipping build.
+                    )
+                    '''
                 }
             }
         }
@@ -32,7 +50,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 bat 'docker-compose down'
-                bat 'docker-compose up -d --build'
+                bat 'docker-compose up -d'
             }
         }
     }
