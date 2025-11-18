@@ -6,19 +6,19 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copiar proyecto completo
+# Copiar todo el código fuente
 COPY . .
 
-# Compilar Ionic + Vue
+# Compilar Vue
 RUN npm run build
 
 # ----------- SERVE STAGE -----------
 FROM nginx:alpine
 
-# Copiar build final al servidor NGINX
+# Copiar build generado al NGINX
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Exponer el puerto interno que usará NGINX
+# Exponer puerto interno
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
