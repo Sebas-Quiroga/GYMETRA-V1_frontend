@@ -8,13 +8,25 @@ pipeline {
                 checkout scm
 
                 script {
-                    // Obtener la rama desde Jenkins
-                    def branchName = env.BRANCH_NAME ?: "desconocida"
-                    def safeBranch = branchName.replace('/', '-')
-                    env.SAFE_BRANCH = safeBranch
+                    // Obtener la rama actual desde Jenkins o Git (Windows-safe)
+                    def branchName = env.BRANCH_NAME ?: ''
+                    if (!branchName) {
+                        branchName = bat(
+                            script: 'git rev-parse --abbrev-ref HEAD',
+                            returnStdout: true
+                        ).trim()
+                    }
 
                     echo "Rama detectada: ${branchName}"
-                    echo "SAFE_BRANCH: ${env.SAFE_BRANCH}"
+
+                    // Sanitizar la rama para Docker y nombres de archivos
+                    def safeBranch = branchName
+                        .replaceAll('[^a-zA-Z0-9_.-]', '_')
+                        .replace('/', '-')
+                        .trim()
+
+                    env.SAFE_BRANCH = safeBranch
+                    echo "SAFE_BRANCH final: ${env.SAFE_BRANCH}"
                 }
             }
         }
