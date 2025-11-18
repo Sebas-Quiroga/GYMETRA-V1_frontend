@@ -8,7 +8,7 @@ pipeline {
                 checkout scm
 
                 script {
-                    // Obtener la rama actual
+                    // Obtener la rama actual desde git
                     def branch = bat(
                         script: 'git rev-parse --abbrev-ref HEAD',
                         returnStdout: true
