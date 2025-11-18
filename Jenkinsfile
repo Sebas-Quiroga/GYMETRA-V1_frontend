@@ -8,23 +8,24 @@ pipeline {
                 checkout scm
 
                 script {
-                    // Obtener la rama actual desde git (Windows-safe)
-                    def rawBranch = bat(
-                        script: 'git rev-parse --abbrev-ref HEAD',
-                        returnStdout: true
-                    ).trim()
+                    // Obtener la rama actual desde Jenkins o Git (Windows-safe)
+                    def branchName = env.BRANCH_NAME ?: ''
+                    if (!branchName) {
+                        branchName = bat(
+                            script: 'git rev-parse --abbrev-ref HEAD',
+                            returnStdout: true
+                        ).trim()
+                    }
 
-                    echo "Rama bruta detectada: ${rawBranch}"
+                    echo "Rama detectada: ${branchName}"
 
-                    // Sanitizar la rama para que Docker la acepte
-                    // Solo permite: letras, números, puntos, guiones y subrayados
-                    def safe = rawBranch
+                    // Sanitizar la rama para Docker y nombres de archivos
+                    def safeBranch = branchName
                         .replaceAll('[^a-zA-Z0-9_.-]', '_')
-                        .replace('/', '-') // extra seguridad
+                        .replace('/', '-')
                         .trim()
 
-                    env.SAFE_BRANCH = safe
-
+                    env.SAFE_BRANCH = safeBranch
                     echo "SAFE_BRANCH final: ${env.SAFE_BRANCH}"
                 }
             }
@@ -34,15 +35,22 @@ pipeline {
             steps {
                 dir('frontend/admin-frontend') {
                     bat '''
-                        echo Instalando dependencias...
+                        echo === ADMIN FRONTEND ===
+
                         if not exist node_modules (
+                            echo Instalando dependencias...
                             call npm install
                         ) else (
                             echo node_modules ya existe. Saltando instalación...
                         )
 
-                        echo Construyendo proyecto...
-                        call npm run build
+                        if not exist dist (
+                            echo Construyendo proyecto...
+                            call npm run build
+                        ) else (
+                            echo Build ya existe. Saltando compilación...
+                        )
+
                         echo Build admin-frontend completado.
                     '''
                 }
@@ -53,15 +61,22 @@ pipeline {
             steps {
                 dir('frontend/gymetra-frontend') {
                     bat '''
-                        echo Instalando dependencias...
+                        echo === GYMETRA FRONTEND ===
+
                         if not exist node_modules (
+                            echo Instalando dependencias...
                             call npm install
                         ) else (
                             echo node_modules ya existe. Saltando instalación...
                         )
 
-                        echo Construyendo proyecto...
-                        call npm run build
+                        if not exist dist (
+                            echo Construyendo proyecto...
+                            call npm run build
+                        ) else (
+                            echo Build ya existe. Saltando compilación...
+                        )
+
                         echo Build gymetra-frontend completado.
                     '''
                 }
@@ -71,7 +86,7 @@ pipeline {
         stage('Deploy with Docker Compose') {
             steps {
                 bat '''
-                    echo Verificando estado de los servicios Docker...
+                    echo === DEPLOY DOCKER COMPOSE ===
                     docker compose ps > status.txt 2>&1
 
                     findstr /C:"Up" status.txt >nul
