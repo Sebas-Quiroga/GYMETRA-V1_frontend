@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  admin-frontend:
+    build: ./frontend/admin-frontend
+    ports:
+      - "8101:8101"
+    container_name: ${SAFE_BRANCH}-admin-frontend
+
+  gymetra-frontend:
+    build: ./frontend/gymetra-frontend
+    ports:
+      - "8100:80"
+    container_name: ${SAFE_BRANCH}-gymetra-frontend
+
