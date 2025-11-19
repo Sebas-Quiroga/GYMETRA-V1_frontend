@@ -1,24 +1,18 @@
 <template>
   <ion-page>
-    <!-- 🔹 Encabezado superior -->
-    <div class="qr-header-bar" role="banner" aria-label="Encabezado de QR">
-      <button class="qr-back-btn" @click="$router.back()" aria-label="Volver" tabindex="0">
-        <svg
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#fff"
-          stroke-width="2.5"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-      </button>
-      <span class="qr-header-title" aria-label="Escanear QR">Escanear QR</span>
-    </div>
+    <!-- Header con navegación -->
+    <ion-header>
+      <ion-toolbar color="primary" class="custom-toolbar" role="banner" aria-label="Encabezado principal">
+        <ion-title class="page-title" aria-label="Escanear QR">Escanear QR</ion-title>
+        <ion-buttons slot="end">
+          <!-- Botón de salir -->
+          <ion-button fill="clear" @click="logout" aria-label="Cerrar sesión">
+            <ion-icon :icon="logOutOutline"></ion-icon>
+            Salir
+          </ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
 
     <!-- 🔹 Contenido principal -->
     <ion-content role="main" aria-label="QR de acceso" class="qr-content">
@@ -59,12 +53,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import { useAuthStore } from '@/stores/auth'
+import { logOutOutline } from 'ionicons/icons';
 import { HOST_URL } from"../services/hots";
 
 // 📦 Store de autenticación
 const auth = useAuthStore()
+const router = useRouter()
+
+const logout = () => {
+  auth.clearToken();
+  router.push("/login");
+};
 
 // 🧩 Estados reactivos
 const qrCode = ref<string | null>(null)

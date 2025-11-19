@@ -1,13 +1,20 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar color="primary">
+      <ion-toolbar color="primary" class="custom-toolbar" role="banner" aria-label="Encabezado principal">
         <ion-buttons slot="start">
           <ion-button @click="goBack" fill="clear">
             <ion-icon :icon="arrowBackOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
-        <ion-title>Crear Cuenta</ion-title>
+        <ion-title class="page-title" aria-label="Crear Cuenta">Crear Cuenta</ion-title>
+        <ion-buttons slot="end">
+          <!-- Botón de salir -->
+          <ion-button fill="clear" @click="logout" aria-label="Cerrar sesión">
+            <ion-icon :icon="logOutOutline"></ion-icon>
+            Salir
+          </ion-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -420,6 +427,7 @@ import {
   alertCircle,
   warningOutline,
   informationCircle,
+  logOutOutline,
 } from "ionicons/icons";
 
 // Importar el servicio de registro
@@ -784,6 +792,10 @@ const toggleAcceptData = () => {
 
 const goBack = () => {
   router.back();
+};
+
+const logout = () => {
+  router.push("/login");
 };
 
 const goToLogin = () => {
