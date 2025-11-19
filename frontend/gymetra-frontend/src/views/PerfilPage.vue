@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { arrowBackOutline, settingsOutline, createOutline, cameraOutline, imagesOutline, checkmarkCircle, alertCircle, informationCircle, warningOutline, trashOutline, addOutline, mailOutline, lockClosedOutline, callOutline, personCircleOutline, logOutOutline } from 'ionicons/icons';
+import { arrowBackOutline, settingsOutline, createOutline, cameraOutline, imagesOutline, checkmarkCircle, alertCircle, informationCircle, warningOutline, trashOutline, addOutline, mailOutline, lockClosedOutline, callOutline, personCircleOutline } from 'ionicons/icons';
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { decodeJWT } from '@/services/authService';
@@ -265,11 +265,6 @@ type NotificationType = 'success' | 'error' | 'info';
 const showNotification = (type: NotificationType, title: string, message: string) => {
   notification.value = { show: true, type, title, message, icon: type === 'success' ? 'checkmarkCircle' : type === 'info' ? 'informationCircle' : 'alertCircle' };
   setTimeout(() => { notification.value.show = false; }, 5000);
-};
-
-const logout = () => {
-  auth.clearToken();
-  router.push("/login");
 };
 
 const dismissNotification = () => {

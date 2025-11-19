@@ -31,14 +31,12 @@
     <!-- Header con navegación -->
     <ion-header>
       <ion-toolbar color="primary" class="custom-toolbar" role="banner" aria-label="Encabezado principal">
-        <ion-title class="page-title" aria-label="Planes">Planes</ion-title>
-        <ion-buttons slot="end">
-          <!-- Botón de salir -->
-          <ion-button fill="clear" @click="logout" aria-label="Cerrar sesión">
-            <ion-icon :icon="logOutOutline"></ion-icon>
-            Salir
+        <ion-buttons slot="start">
+          <ion-button fill="clear" @click="$router.back()" aria-label="Volver">
+            <ion-icon :icon="arrowBackOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
+        <ion-title class="page-title" aria-label="Planes">Planes</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content class="planes-content" role="main" aria-label="Listado de planes">
@@ -115,9 +113,9 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, reactive, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { IonPage, IonContent, IonIcon, IonButton } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonContent, IonIcon, IonButton } from '@ionic/vue';
 import { useAuthStore } from '@/stores/auth'
-import { checkmarkCircle, alertCircle, warningOutline, informationCircle, closeCircle, logOutOutline } from 'ionicons/icons';
+import { checkmarkCircle, alertCircle, warningOutline, informationCircle, closeCircle, arrowBackOutline } from 'ionicons/icons';
 import {
   getAvailableMemberships,
   purchaseMembership,
@@ -189,11 +187,6 @@ const showNotification = (
   notificationTimer = setTimeout(() => {
     dismissNotification();
   }, duration);
-};
-
-const logout = () => {
-  auth.clearToken();
-  router.push("/login");
 };
 
 const dismissNotification = () => {

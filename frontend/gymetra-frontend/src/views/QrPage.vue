@@ -3,14 +3,12 @@
     <!-- Header con navegación -->
     <ion-header>
       <ion-toolbar color="primary" class="custom-toolbar" role="banner" aria-label="Encabezado principal">
-        <ion-title class="page-title" aria-label="Escanear QR">Escanear QR</ion-title>
-        <ion-buttons slot="end">
-          <!-- Botón de salir -->
-          <ion-button fill="clear" @click="logout" aria-label="Cerrar sesión">
-            <ion-icon :icon="logOutOutline"></ion-icon>
-            Salir
+        <ion-buttons slot="start">
+          <ion-button fill="clear" @click="$router.back()" aria-label="Volver">
+            <ion-icon :icon="arrowBackOutline"></ion-icon>
           </ion-button>
         </ion-buttons>
+        <ion-title class="page-title" aria-label="Escanear QR">Escanear QR</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -56,17 +54,13 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
 import { useAuthStore } from '@/stores/auth'
-import { logOutOutline } from 'ionicons/icons';
+import { arrowBackOutline } from 'ionicons/icons';
 import { HOST_URL } from"../services/hots";
 
 // 📦 Store de autenticación
 const auth = useAuthStore()
 const router = useRouter()
 
-const logout = () => {
-  auth.clearToken();
-  router.push("/login");
-};
 
 // 🧩 Estados reactivos
 const qrCode = ref<string | null>(null)
